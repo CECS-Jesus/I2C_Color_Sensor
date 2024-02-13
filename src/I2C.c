@@ -3,9 +3,6 @@
  *
  *	Main implementation of the I2C Init, Read, and Write Function
  *
- * Created on: May 24th, 2023
- *		Author: Jackie Huynh
- *
  */
  
 #include "I2C.h"
@@ -83,7 +80,7 @@ uint8_t I2C0_Receive(uint8_t slave_addr, uint8_t slave_reg_addr){
 	I2C0_MCS_R = I2C_MCS_START | I2C_MCS_STOP | I2C_MCS_RUN;
 
 	/* Wait until I2C bus is not busy */
-	while((I2C0_MCS_R&I2C_MCS_BUSY) == I2C_MCS_BUSY);
+	while((I2C0_MCS_R&I2C_MCS_BUSBSY) == I2C_MCS_BUSBSY);
 
 	/* Check for any error: read the error flag */
 	error = I2C0_MCS_R & I2C_MCS_ERROR;
@@ -104,104 +101,36 @@ uint8_t I2C0_Transmit(uint8_t slave_addr, uint8_t slave_reg_addr, uint8_t data){
 	char error;							//Temp Variable to hold errors
 
 	/* Check if I2C0 is busy */
-	while(CODE_FILL);
+	while((I2C0_MCS_R&I2C_MCS_BUSY) == I2C_MCS_BUSY);
 
 	/* Configure I2C Slave Address, R/W Mode, and what to transmit */
-	I2C0_MSA_R = CONSTANT_FILL;			//Slave Address is the first 7 MSB
+	I2C0_MSA_R = (slave_addr << 1);	//Slave Address is the first 7 MSB
 	I2C0_MSA_R &= ~I2C0_RW_PIN;			//Clear LSB to write
-	I2C0_MDR_R = CONSTANT_FILL;			//Transmit register addr to interact
+	I2C0_MDR_R = slave_reg_addr;			//Transmit register addr to interact
 
 	/* Initiate I2C by generate a START bit and RUN cmd */
-	I2C0_MCS_R = CODE_FILL;
+	I2C0_MCS_R = I2C_MCS_START | I2C_MCS_RUN;
 
 	/* Wait until write has been completed */
-	while(CODE_FILL);
+	while((I2C0_MCS_R&I2C_MCS_BUSY) == I2C_MCS_BUSY);
 
 	/* Set Data Reg to desired transmission */
-	I2C0_MDR_R = CONSTANT_FILL; 
+	I2C0_MDR_R = data; 
 
 	/* Initiate I2C by generating a STOP & RUN cmd */
-	I2C0_MCS_R = CODE_FILL;
+	I2C0_MCS_R = I2C_MCS_STOP | I2C_MCS_RUN;
 
 	/* Wait until write has been completed */
-	while(CODE_FILL);
+	while((I2C0_MCS_R&I2C_MCS_BUSY) == I2C_MCS_BUSY);
 
 	/* Wait until bus isn't busy */
-	while(CODE_FILL);
+	while((I2C0_MCS_R&I2C_MCS_BUSBSY) == I2C_MCS_BUSBSY);
 
 	/* Check for any error */
-	error = CODE_FILL;
+	error = I2C0_MCS_R & I2C_MCS_ERROR;
 	if(error != 0)
 		return error;
 	else
 		return 0;
 	
-}
-
-//Has Yet to be Implemented
-/*
- *	----------------I2C0_Burst_Receive-----------------
- *	Polls to receive multiple bytes of data from specified
- *  peripheral by incrementing starting slave register address
- *	Input: Slave address, Slave Register Address, Data Buffer
- *	Output: None
- */
-void I2C0_Burst_Receive(uint8_t slave_addr, uint8_t slave_reg_addr, uint8_t* data, uint32_t size){
-	
-}
-
-/*
- *	----------------I2C0_Burst_Transmit-----------------
- *	Transmit multiple bytes of data to specified peripheral
- *  by incrementing starting slave address
- *	Input: Slave address, Slave Register Address, Data Buffer to transmit
- *	Output: None
- */
-uint8_t I2C0_Burst_Transmit(uint8_t slave_addr, uint8_t slave_reg_addr, uint8_t* data, uint32_t size){
-
-	char error;							//Temp Error Variable
-
-	/* Asserting Param */
-	if(size <= 0)
-		return 0;
-
-	/* Check if I2C0 is busy */
-	while(CODE_FILL);
-
-	/* Configure I2C Slave Address, R/W Mode, and what to transmit */
-	I2C0_MSA_R = CONSTANT_FILL;				//Slave Address is the first 7 MSB
-	I2C0_MSA_R &= CONSTANT_FILL;			//Clear LSB to write
-	I2C0_MDR_R = CONSTANT_FILL;				//Transmit register addr to interact
-
-	/* Initiate I2C by generate a START bit and RUN cmd */
-	I2C0_MCS_R = CODE_FILL;
-
-	/* Wait until write has been completed */
-	while(CODE_FILL);
-
-	/* Loop to Burst Transmit what is stored in data buffer */
-	while(size > 1){
-		
-		I2C0_MDR_R = CONSTANT_FILL;			//Deference Pointer from data array and load into data reg. Post-Increment the pointer after
-		I2C0_MCS_R = RUN_CMD;				//Initiate I2C RUN CMD
-		while(CODE_FILL);					//Wait until transmit is complete
-		size--;								//Reduce size until 1 is left
-		
-	}
-
-	I2C0_MDR_R = CONSTANT_FILL;				//Deference Pointer from data array and load into data reg
-	I2C0_MCS_R = CODE_FILL;					//Initiate I2C STOP condition and RUN CMD
-
-	/* Wait until write has been completed */
-	while(CODE_FILL);
-
-	/* Wait until bus isn't busy */
-	while(CODE_FILL);
-
-	/* Check for any error */
-	error = CODE_FILL;
-	if(error != 0)
-		return error;
-	else
-		return 0;
 }
