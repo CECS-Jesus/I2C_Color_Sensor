@@ -4,9 +4,6 @@
  *	Main implementation of the functions to interact with
  *	the TCS34725 RGB Color Sensor
  *
- * Created on: May 24th, 2023
- *		Author: Jackie Huynh
- *
  */
 
 #include "TCS34725.h"
@@ -90,10 +87,11 @@ uint16_t TCS34725_GET_RAW_CLEAR(void){
 	uint16_t CLEAR_DATA;
 	
 	/* Use I2C to grab both HIGH and LOW data */
-	//CODE_FILL
+	CLEAR_LOW = I2C0_Receive(TCS34725_ADDR, TCS34725_CMD|TCS34725_CDATAL);
+	CLEAR_HIGH = I2C0_Receive(TCS34725_ADDR, TCS34725_CMD|TCS34725_CDATAH);
 	
 	/* Concatanate into 16-bit value */
-	//CODE_FILL
+	CLEAR_DATA = ((uint16_t)CLEAR_HIGH << 8) | CLEAR_LOW;
 	
 	//Integration Time Delay
 	DELAY_1MS(3);
@@ -112,10 +110,11 @@ uint16_t TCS34725_GET_RAW_RED(void){
 	uint16_t RED_DATA;
 	
 	/* Use I2C to grab both HIGH and LOW data */
-	//CODE_FILL
+	RED_LOW = I2C0_Receive(TCS34725_ADDR, TCS34725_CMD|TCS34725_RDATAL);
+	RED_HIGH = I2C0_Receive(TCS34725_ADDR, TCS34725_CMD|TCS34725_RDATAH);
 	
 	/* Concatanate into 16-bit value */
-	//CODE_FILL
+	RED_DATA = ((uint16_t)RED_HIGH << 8) | RED_LOW;
 	
 	//Integration Time Delay
 	DELAY_1MS(3);
@@ -134,10 +133,11 @@ uint16_t TCS34725_GET_RAW_GREEN(void){
 	uint16_t GREEN_DATA;
 	
 	/* Use I2C to grab both HIGH and LOW data */
-	//CODE_FILL
+	GREEN_LOW = I2C0_Receive(TCS34725_ADDR, TCS34725_CMD|TCS34725_GDATAL);
+	GREEN_HIGH = I2C0_Receive(TCS34725_ADDR, TCS34725_CMD|TCS34725_GDATAH);
 	
 	/* Concatanate into 16-bit value */
-	//CODE_FILL
+	GREEN_DATA = ((uint16_t)GREEN_HIGH << 8) | GREEN_LOW;
 	
 	//Integration Time Delay
 	DELAY_1MS(3);
@@ -156,10 +156,11 @@ uint16_t TCS34725_GET_RAW_BLUE(void){
 	uint16_t BLUE_DATA;
 	
 	/* Use I2C to grab both HIGH and LOW data */
-	//CODE_FILL
+	BLUE_LOW = I2C0_Receive(TCS34725_ADDR, TCS34725_CMD|TCS34725_BDATAL);
+	BLUE_HIGH = I2C0_Receive(TCS34725_ADDR, TCS34725_CMD|TCS34725_BDATAH);
 	
 	/* Concatanate into 16-bit value*/
-	//CODE_FILL
+	BLUE_DATA = ((uint16_t)BLUE_HIGH << 8) | BLUE_LOW;
 	
 	//Integration Time Delay
 	DELAY_1MS(3);
@@ -175,7 +176,7 @@ uint16_t TCS34725_GET_RAW_BLUE(void){
 void TCS34725_GET_RGB(RGB_COLOR_HANDLE_t* RGB_COLOR_Instance){
 	
 	/* Prevent Dividing by 0 by checking if the C_RAW value from struct is equal to 0 */
-	if(CODE_FILL){
+	if (RGB_COLOR_Instance->C_RAW == 0){
 		RGB_COLOR_Instance->R = RGB_COLOR_Instance->G = RGB_COLOR_Instance->B = 0;
 		return;
 	}
@@ -184,8 +185,9 @@ void TCS34725_GET_RGB(RGB_COLOR_HANDLE_t* RGB_COLOR_Instance){
 	Divide all RGB value with their (RAW Value / Clear Raw Value) and multiple everything with 255.0
 	Store in RGB Color Instance Struct
 	*/ 
-	
-	//CODE_FILL
+	RGB_COLOR_Instance->R = ((float)RGB_COLOR_Instance->R_RAW / (float)RGB_COLOR_Instance->C_RAW) * 255.0;
+  RGB_COLOR_Instance->G = ((float)RGB_COLOR_Instance->G_RAW / (float)RGB_COLOR_Instance->C_RAW) * 255.0;
+  RGB_COLOR_Instance->B = ((float)RGB_COLOR_Instance->B_RAW / (float)RGB_COLOR_Instance->C_RAW) * 255.0;
 	
 }
 
@@ -197,11 +199,11 @@ void TCS34725_GET_RGB(RGB_COLOR_HANDLE_t* RGB_COLOR_Instance){
 COLOR_DETECTED Detect_Color(RGB_COLOR_HANDLE_t* RGB_COLOR_Instance){
 	
 	/* Compare all values with eachother and return which color is prominent using enum type */
-	if(CODE_FILL)
+	if(RGB_COLOR_Instance->R > RGB_COLOR_Instance->G && RGB_COLOR_Instance->R > RGB_COLOR_Instance->B)
 		return RED_DETECT;
-	else if(CODE_FILL)
+	else if(RGB_COLOR_Instance->G > RGB_COLOR_Instance->R && RGB_COLOR_Instance->G > RGB_COLOR_Instance->B)
 		return GREEN_DETECT;
-	else if(CODE_FILL)
+	else if(RGB_COLOR_Instance->B > RGB_COLOR_Instance->R && RGB_COLOR_Instance->B > RGB_COLOR_Instance->G)
 		return BLUE_DETECT;
 	
 	/* Otherwise no color is being detected */
