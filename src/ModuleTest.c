@@ -204,24 +204,8 @@ void Module_Test(MODULE_TEST_NAME test) {
 			Test_UART();
 			break;
 		
-		case MPU6050_TEST:
-			Test_MPU6050();
-			break;
-		
 		case TCS34725_TEST:
 			Test_TCS34725();
-			break;
-		
-		case SERVO_TEST:
-			Test_Servo();
-			break;
-		
-		case LCD_TEST:
-			Test_LCD();
-			break;
-			
-		case FULL_SYSTEM_TEST:
-			Test_Full_System();
 			break;
 		
 		default:
