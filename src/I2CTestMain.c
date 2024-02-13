@@ -1,15 +1,3 @@
-/*
- * I2CTestMain.c
- *
- *	Test the basic functionality of I2C by reading and writing to the 
- *	TCS34725 RGB Sensor and MPU6050 6-dof IMU, as well as controlling
- *	a Servo Motor and a 16x2 LCD 
- *
- * Created on: May 24th, 2023
- *		Author: Jackie Huynh
- *
- */
- 
 #include "tm4c123gh6pm.h"
 #include "I2C.h"
 #include "UART0.h"
@@ -24,7 +12,7 @@
 #include "ModuleTest.h"
 
 /* List of Predefined Macros for individual Peripheral Testing */
-#define DELAY
+//#define DELAY
 #define UART
 #define TCS34725
 //#define MPU6050
@@ -74,25 +62,9 @@ int main(void){
 		Module_Test(UART_TEST);
 		#endif
 		
-		#ifdef MPU6050
-		Module_Test(MPU6050_TEST);
-		#endif
-		
 		#ifdef TCS34725
 		Module_Test(TCS34725_TEST);
-		#endif
-		
-		#ifdef SERVO
-		Module_Test(SERVO_TEST);
-		#endif
-		
-		#ifdef LCD
-		Module_Test(LCD_TEST);
-		#endif
-		
-		#ifdef FULL_SYSTEM
-		Module_Test(FULL_SYSTEM_TEST);
-		#endif
+		#endif	
 		
 	}
 	
